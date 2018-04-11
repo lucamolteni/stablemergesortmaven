@@ -9,8 +9,11 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args) {
-        // write your code here
+        failOnSorting();
+        failOnSortingMinimalCase();
+    }
 
+    private static void failOnSorting() {
         final List<InternalKnowledgePackage> clonedPkgs = new ArrayList<>();
 
         for (int i = 0; i < 1000; i++) {
@@ -35,5 +38,19 @@ public class Main {
         final Comparator<InternalKnowledgePackage> comparator = (p1, p2) -> p1.getRules().isEmpty() || p2.getRules().isEmpty() ? 0 : p1.getName().compareTo(p2.getName());
 
         clonedPkgs.sort(comparator);
+    }
+
+    private static void failOnSortingMinimalCase() {
+        final List<InternalKnowledgePackage> clonedPkgs = new ArrayList<>();
+
+        clonedPkgs.add(new InternalKnowledgePackage("l", Collections.singletonList("rule1")));
+        clonedPkgs.add(new InternalKnowledgePackage("p", Collections.emptyList()));
+        clonedPkgs.add(new InternalKnowledgePackage("c", Collections.emptyList()));
+
+        final Comparator<InternalKnowledgePackage> comparator = (p1, p2) -> p1.getRules().isEmpty() || p2.getRules().isEmpty() ? 0 : p1.getName().compareTo(p2.getName());
+
+        clonedPkgs.sort(comparator);
+
+        System.out.println("clonedPkgs = " + clonedPkgs);
     }
 }
