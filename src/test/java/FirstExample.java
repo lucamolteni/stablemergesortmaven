@@ -29,13 +29,13 @@ public class FirstExample {
                            @From(Encoded.class) @InCharset("ascii") String b
     ) throws Exception {
 
-        Comparator<InternalKnowledgePackage> name = Comparator.comparing(InternalKnowledgePackage::getName);
+        Comparator<InternalKnowledgePackage> func = Comparator.comparing(InternalKnowledgePackage::getName);
 
         InternalKnowledgePackage ia = new InternalKnowledgePackage(a, Collections.emptyList());
         InternalKnowledgePackage ib = new InternalKnowledgePackage(b, Collections.emptyList());
 
-        final int compareAB = name.compare(ia, ib);
-        final int compareBA = name.compare(ib, ia);
+        final int compareAB = func.compare(ia, ib);
+        final int compareBA = func.compare(ib, ia);
 
 //        System.out.println("compareAB = " + compareAB);
 //        System.out.println("compareBA = " + compareBA);
@@ -53,14 +53,14 @@ public class FirstExample {
                            List<@From(Encoded.class) @InCharset("ascii") String> rulesB
     ) throws Exception {
 
-        BiFunction<InternalKnowledgePackage, InternalKnowledgePackage, Integer> func =
+        Comparator<InternalKnowledgePackage> func =
                 (p1, p2) -> p1.getRules().isEmpty() || p2.getRules().isEmpty() ? 0 : p1.getName().compareTo(p2.getName());
 
         InternalKnowledgePackage ia = new InternalKnowledgePackage(a, rulesA);
         InternalKnowledgePackage ib = new InternalKnowledgePackage(b, rulesB);
 
-        final int compareAB = func.apply(ia, ib);
-        final int compareBA = func.apply(ib, ia);
+        final int compareAB = func.compare(ia, ib);
+        final int compareBA = func.compare(ib, ia);
 
         assertEquals(signum(compareAB), -signum(compareBA));
     }
@@ -77,19 +77,19 @@ public class FirstExample {
                            @InRange(min = "0", max = "100") Integer rulesC
     ) throws Exception {
 
-        BiFunction<InternalKnowledgePackage, InternalKnowledgePackage, Integer> func =
+        Comparator<InternalKnowledgePackage> func =
                 (p1, p2) -> p1.getRules().isEmpty() || p2.getRules().isEmpty() ? 0 : p1.getName().compareTo(p2.getName());
 
         InternalKnowledgePackage ia = new InternalKnowledgePackage(a, collectionOfSize(rulesA));
         InternalKnowledgePackage ib = new InternalKnowledgePackage(b, collectionOfSize(rulesB));
         InternalKnowledgePackage ic = new InternalKnowledgePackage(c, collectionOfSize(rulesC));
 
-        if ((func.apply(ia, ib)) > 0 && (func.apply(ib, ic) > 0)) {
+        if ((func.compare(ia, ib)) > 0 && (func.compare(ib, ic) > 0)) {
 
 //            System.out.println("ia = " + ia);
 //            System.out.println("ib = " + ib);
 //            System.out.println("ic = " + ic);
-            assertTrue(func.apply(ia, ic) > 0);
+            assertTrue(func.compare(ia, ic) > 0);
         }
 
         assertTrue(true);
@@ -107,19 +107,19 @@ public class FirstExample {
                            @InRange(min = "0", max = "200") Integer rulesC
     ) throws Exception {
 
-        BiFunction<InternalKnowledgePackage, InternalKnowledgePackage, Integer> func =
+        Comparator<InternalKnowledgePackage> func =
                 (p1, p2) -> p1.getRules().isEmpty() || p2.getRules().isEmpty() ? 0 : p1.getName().compareTo(p2.getName());
 
         InternalKnowledgePackage ia = new InternalKnowledgePackage(a, collectionOfSize(rulesA));
         InternalKnowledgePackage ib = new InternalKnowledgePackage(b, collectionOfSize(rulesB));
         InternalKnowledgePackage ic = new InternalKnowledgePackage(c, collectionOfSize(rulesC));
 
-        if ((func.apply(ia, ib)) == 0) {
+        if ((func.compare(ia, ib)) == 0) {
 
 //            System.out.println("ia = " + ia);
 //            System.out.println("ib = " + ib);
 //            System.out.println("ic = " + ic);
-            assertEquals(signum(func.apply(ia, ic)), signum(func.apply(ib, ic)));
+            assertEquals(signum(func.compare(ia, ic)), signum(func.compare(ib, ic)));
         }
 
         assertTrue(true);
