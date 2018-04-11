@@ -99,12 +99,12 @@ public class FirstExample {
     /*
     Finally, the implementor must ensure that x.compareTo(y)==0 implies that sgn(x.compareTo(z)) == sgn(y.compareTo(z)), for all z.
      */
-    public void equalsSignComparingEqualsElements(@From(Encoded.class) @InCharset("ascii") String a,
-                           @From(Encoded.class) @InCharset("ascii") String b,
-                           @From(Encoded.class) @InCharset("ascii") String c,
-                           @InRange(min = "0", max = "50") Integer rulesA,
-                           @InRange(min = "0", max = "100") Integer rulesB,
-                           @InRange(min = "0", max = "200") Integer rulesC
+    public void equalsSignComparingEqualsElements(@From(SimplePackageNameGenerator.class) @SimplePackageName String a,
+                                                  @From(SimplePackageNameGenerator.class) @SimplePackageName String b,
+                                                  @From(SimplePackageNameGenerator.class) @SimplePackageName String c,
+                           @InRange(min = "0", max = "5") Integer rulesA,
+                           @InRange(min = "0", max = "8") Integer rulesB,
+                           @InRange(min = "0", max = "2") Integer rulesC
     ) throws Exception {
 
         Comparator<InternalKnowledgePackage> func =
@@ -116,10 +116,17 @@ public class FirstExample {
 
         if ((func.compare(ia, ib)) == 0) {
 
-//            System.out.println("ia = " + ia);
-//            System.out.println("ib = " + ib);
-//            System.out.println("ic = " + ic);
-            assertEquals(signum(func.compare(ia, ic)), signum(func.compare(ib, ic)));
+
+            final int signIAIC = signum(func.compare(ia, ic));
+            final int signIBIC = signum(func.compare(ib, ic));
+            if(signIAIC != signIBIC) {
+                System.out.println("ia = " + ia);
+                System.out.println("ib = " + ib);
+                System.out.println("ic = " + ic);
+                System.out.println("signIAIC = " + signIAIC);
+                System.out.println("signIBIC = " + signIBIC);
+            }
+            assertEquals(signIAIC, signIBIC);
         }
 
         assertTrue(true);
