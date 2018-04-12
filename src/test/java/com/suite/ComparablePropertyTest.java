@@ -1,60 +1,35 @@
+package com.suite;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.BiFunction;
 
 import com.pholser.junit.quickcheck.From;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.InRange;
 import com.pholser.junit.quickcheck.generator.java.lang.Encoded;
 import com.pholser.junit.quickcheck.generator.java.lang.Encoded.InCharset;
-import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import com.redhat.InternalKnowledgePackage;
-import org.junit.runner.RunWith;
 
 import static java.lang.Integer.signum;
 import static org.junit.Assert.*;
 
-@RunWith(JUnitQuickcheck.class)
-public class FirstExample {
+public abstract class ComparablePropertyTest {
 
-    @Property
-    /*
-        The implementor must ensure sgn(x.compareTo(y)) == -sgn(y.compareTo(x)) for all x and y. (This implies that x.compareTo(y) must throw an exception iff y.compareTo(x) throws an exception.)
-
-     */
-    public void negatedSignComparingNames(@From(Encoded.class) @InCharset("ascii") String a,
-                           @From(Encoded.class) @InCharset("ascii") String b
-    ) throws Exception {
-
-        Comparator<InternalKnowledgePackage> func = Comparator.comparing(InternalKnowledgePackage::getName);
-
-        InternalKnowledgePackage ia = new InternalKnowledgePackage(a, Collections.emptyList());
-        InternalKnowledgePackage ib = new InternalKnowledgePackage(b, Collections.emptyList());
-
-        final int compareAB = func.compare(ia, ib);
-        final int compareBA = func.compare(ib, ia);
-
-//        System.out.println("compareAB = " + compareAB);
-//        System.out.println("compareBA = " + compareBA);
-
-        assertEquals(signum(compareAB), -signum(compareBA));
-    }
+    protected abstract Comparator<InternalKnowledgePackage> getComparingMethod();
 
     @Property(trials = 1000)
     /*
     The implementor must ensure sgn(x.compareTo(y)) == -sgn(y.compareTo(x)) for all x and y. (This implies that x.compareTo(y) must throw an exception iff y.compareTo(x) throws an exception.)
      */
     public void negatedSignComparingNamesAndRules(@From(Encoded.class) @InCharset("ascii") String a,
-                           @From(Encoded.class) @InCharset("ascii") String b,
-                           List<@From(Encoded.class) @InCharset("ascii") String> rulesA,
-                           List<@From(Encoded.class) @InCharset("ascii") String> rulesB
+                                                  @From(Encoded.class) @InCharset("ascii") String b,
+                                                  List<@From(Encoded.class) @InCharset("ascii") String> rulesA,
+                                                  List<@From(Encoded.class) @InCharset("ascii") String> rulesB
     ) throws Exception {
 
-        Comparator<InternalKnowledgePackage> func =
-                (p1, p2) -> p1.getRules().isEmpty() || p2.getRules().isEmpty() ? 0 : p1.getName().compareTo(p2.getName());
+        Comparator<InternalKnowledgePackage> func = getComparingMethod();
 
         InternalKnowledgePackage ia = new InternalKnowledgePackage(a, rulesA);
         InternalKnowledgePackage ib = new InternalKnowledgePackage(b, rulesB);
@@ -70,15 +45,14 @@ public class FirstExample {
     The implementor must also ensure that the relation is transitive: (x.compareTo(y)>0 && y.compareTo(z)>0) implies x.compareTo(z)>0.
      */
     public void transitiveProperty(@From(Encoded.class) @InCharset("ascii") String a,
-                           @From(Encoded.class) @InCharset("ascii") String b,
-                           @From(Encoded.class) @InCharset("ascii") String c,
-                           @InRange(min = "0", max = "100") Integer rulesA,
-                           @InRange(min = "0", max = "100") Integer rulesB,
-                           @InRange(min = "0", max = "100") Integer rulesC
+                                   @From(Encoded.class) @InCharset("ascii") String b,
+                                   @From(Encoded.class) @InCharset("ascii") String c,
+                                   @InRange(min = "0", max = "100") Integer rulesA,
+                                   @InRange(min = "0", max = "100") Integer rulesB,
+                                   @InRange(min = "0", max = "100") Integer rulesC
     ) throws Exception {
 
-        Comparator<InternalKnowledgePackage> func =
-                (p1, p2) -> p1.getRules().isEmpty() || p2.getRules().isEmpty() ? 0 : p1.getName().compareTo(p2.getName());
+        Comparator<InternalKnowledgePackage> func = getComparingMethod();
 
         InternalKnowledgePackage ia = new InternalKnowledgePackage(a, collectionOfSize(rulesA));
         InternalKnowledgePackage ib = new InternalKnowledgePackage(b, collectionOfSize(rulesB));
@@ -102,13 +76,12 @@ public class FirstExample {
     public void equalsSignComparingEqualsElements(@From(SimplePackageNameGenerator.class) @SimplePackageName String a,
                                                   @From(SimplePackageNameGenerator.class) @SimplePackageName String b,
                                                   @From(SimplePackageNameGenerator.class) @SimplePackageName String c,
-                           @InRange(min = "0", max = "5") Integer rulesA,
-                           @InRange(min = "0", max = "8") Integer rulesB,
-                           @InRange(min = "0", max = "2") Integer rulesC
+                                                  @InRange(min = "0", max = "5") Integer rulesA,
+                                                  @InRange(min = "0", max = "8") Integer rulesB,
+                                                  @InRange(min = "0", max = "2") Integer rulesC
     ) throws Exception {
 
-        Comparator<InternalKnowledgePackage> func =
-                (p1, p2) -> p1.getRules().isEmpty() || p2.getRules().isEmpty() ? 0 : p1.getName().compareTo(p2.getName());
+        Comparator<InternalKnowledgePackage> func = getComparingMethod();
 
         InternalKnowledgePackage ia = new InternalKnowledgePackage(a, collectionOfSize(rulesA));
         InternalKnowledgePackage ib = new InternalKnowledgePackage(b, collectionOfSize(rulesB));
@@ -116,10 +89,9 @@ public class FirstExample {
 
         if ((func.compare(ia, ib)) == 0) {
 
-
             final int signIAIC = signum(func.compare(ia, ic));
             final int signIBIC = signum(func.compare(ib, ic));
-            if(signIAIC != signIBIC) {
+            if (signIAIC != signIBIC) {
                 System.out.println("ia = " + ia);
                 System.out.println("ib = " + ib);
                 System.out.println("ic = " + ic);
